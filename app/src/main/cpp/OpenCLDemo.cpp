@@ -38,46 +38,44 @@
 
 #include "refNR.h"
 #include "openCLNR.h"
+#include <jni.h>
+#include <jni.h>
 
 extern "C" jint
-Java_com_cscao_apps_opencldemo_OpenCLActivity_runOpenCL(JNIEnv *env, jclass clazz, jobject bitmapIn,
-                                                        jobject bitmapOut, jintArray info) {
-
+Java_com_example_opencl_MainActivity_runNativeC(JNIEnv *env, jclass clazz, jobject bmp_in,
+                                                jobject bmp_out, jintArray info) {
     void *bi;
     void *bo;
 
     jint *i = env->GetIntArrayElements(info, NULL);
 
-    AndroidBitmap_lockPixels(env, bitmapIn, &bi);
-    AndroidBitmap_lockPixels(env, bitmapOut, &bo);
+    AndroidBitmap_lockPixels(env, bmp_in, &bi);
+    AndroidBitmap_lockPixels(env, bmp_out, &bo);
 
-    openCLNR((unsigned char *) bi, (unsigned char *) bo, (int *) i);
+    refNR((unsigned char *) bi, (unsigned char *) bo, (int *) i);
 
-    AndroidBitmap_unlockPixels(env, bitmapIn);
-    AndroidBitmap_unlockPixels(env, bitmapOut);
+    AndroidBitmap_unlockPixels(env, bmp_in);
+    AndroidBitmap_unlockPixels(env, bmp_out);
     env->ReleaseIntArrayElements(info, i, 0);
 
     return 0;
 }
 
-
-
 extern "C" jint
-Java_com_cscao_apps_opencldemo_OpenCLActivity_runNativeC(JNIEnv *env, jclass clazz,
-                                                         jobject bitmapIn, jobject bitmapOut,
-                                                         jintArray info) {
+Java_com_example_opencl_MainActivity_runOpenCL(JNIEnv *env, jclass clazz, jobject bmp_in,
+                                               jobject bmp_out, jintArray info) {
     void *bi;
     void *bo;
 
     jint *i = env->GetIntArrayElements(info, NULL);
 
-    AndroidBitmap_lockPixels(env, bitmapIn, &bi);
-    AndroidBitmap_lockPixels(env, bitmapOut, &bo);
+    AndroidBitmap_lockPixels(env, bmp_in, &bi);
+    AndroidBitmap_lockPixels(env, bmp_out, &bo);
 
-    refNR((unsigned char *) bi, (unsigned char *) bo, (int *) i);
+    openCLNR((unsigned char *) bi, (unsigned char *) bo, (int *) i);
 
-    AndroidBitmap_unlockPixels(env, bitmapIn);
-    AndroidBitmap_unlockPixels(env, bitmapOut);
+    AndroidBitmap_unlockPixels(env, bmp_in);
+    AndroidBitmap_unlockPixels(env, bmp_out);
     env->ReleaseIntArrayElements(info, i, 0);
 
     return 0;

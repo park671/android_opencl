@@ -32,7 +32,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-package com.cscao.apps.opencldemo;
+package com.example.opencl;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -43,6 +43,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cscao.apps.opencldemo.R;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,7 +52,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
-public class OpenCLActivity extends Activity {
+public class MainActivity extends Activity {
     protected static final String TAG = "OpenCLActivity";
 
     private void copyFile(final String f) {
