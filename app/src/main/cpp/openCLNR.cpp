@@ -72,7 +72,7 @@ void openCLNR(unsigned char *bufIn, unsigned char *bufOut, int *info) {
         cl::CommandQueue queue(context, devices[0], 0, &err);
 
         std::string kernelSource = loadProgram(
-                "/data/data/com.cscao.apps.opencldemo/app_execdir/bilateralKernel.cl");
+                "/data/data/com.example.opencl/app_execdir/bilateralKernel.cl");
 
         cl::Program::Sources source(1, std::make_pair(kernelSource.c_str(),
                                                       kernelSource.length() + 1));

@@ -43,8 +43,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cscao.apps.opencldemo.R;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
