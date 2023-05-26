@@ -139,3 +139,73 @@ void openCLNR(unsigned char *bufIn, unsigned char *bufOut, int *info) {
     }
     return;
 }
+
+void openCLAdd(int *bufIn, int *bufOut, int size) {
+
+    LOGI("\n\nStart openCLNR (i.e., OpenCL on the GPU)");
+
+    unsigned int bufferSize = size * sizeof(int);
+
+    cl_int err = CL_SUCCESS;
+    try {
+
+        std::vector<cl::Platform> platforms;
+        cl::Platform::get(&platforms);
+        if (platforms.size() == 0) {
+            std::cout << "Platform size 0\n";
+            return;
+        }
+
+        cl_context_properties properties[] =
+                {CL_CONTEXT_PLATFORM, (cl_context_properties) (platforms[0])(), 0};
+        cl::Context context(CL_DEVICE_TYPE_GPU, properties);
+
+        std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+        cl::CommandQueue queue(context, devices[0], 0, &err);
+
+        std::string kernelSource = loadProgram(
+                "/data/data/com.example.opencl/app_execdir/add.cl");
+
+        cl::Program::Sources source(1, std::make_pair(kernelSource.c_str(),
+                                                      kernelSource.length() + 1));
+        cl::Program program(context, source);
+        const char *options = "-cl-fast-relaxed-math";
+        program.build(devices, options);
+
+        cl::Kernel kernel(program, "add", &err);
+        cl::Buffer bufferIn = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                         bufferSize, (void *) &bufIn[0], &err);
+        cl::Buffer bufferOut = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+                                          bufferSize, (void *) &bufOut[0], &err);
+
+        kernel.setArg(0, bufferIn);
+        kernel.setArg(1, bufferOut);
+        kernel.setArg(2, size);
+
+        cl::Event event;
+
+        clock_t startTimer1, stopTimer1;
+        startTimer1 = clock();
+
+// 		one time
+        queue.enqueueNDRangeKernel(kernel,
+                                   cl::NullRange,
+                                   cl::NDRange(size),
+                                   cl::NullRange,
+                                   NULL,
+                                   &event);
+        queue.finish();
+
+        stopTimer1 = clock();
+        double elapse = 1000.0 * (double) (stopTimer1 - startTimer1) / (double) CLOCKS_PER_SEC;
+        size = (int) elapse;
+        LOGI("OpenCL code on the GPU took %g ms\n\n",
+             1000.0 * (double) (stopTimer1 - startTimer1) / (double) CLOCKS_PER_SEC);
+
+        queue.enqueueReadBuffer(bufferOut, CL_TRUE, 0, bufferSize, bufOut);
+    }
+    catch (cl::Error err) {
+        LOGE("ERROR: %s\n", err.what());
+    }
+    return;
+}

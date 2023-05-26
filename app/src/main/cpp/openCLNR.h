@@ -56,5 +56,6 @@
 #include "OpenCLDemo.h"
 
 void openCLNR(unsigned char *bufIn, unsigned char *bufOut, int *info);
+void openCLAdd(int *bufIn, int *bufOut, int size);
 
 #endif

@@ -22,8 +22,9 @@
             android:id="@+id/reset"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:layout_weight="0.33"
+            android:textAllCaps="false"
             android:onClick="showOriginalImage"
             android:text="Reset"
             android:visibility="visible" />
@@ -32,7 +33,8 @@
             android:id="@+id/opencl"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:textSize="20sp"
+            android:textSize="15sp"
+            android:textAllCaps="false"
             android:layout_weight="0.33"
             android:onClick="showOpenCLImage"
             android:text="OpenCL"
@@ -42,10 +44,22 @@
             android:id="@+id/nativeC"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:layout_weight="0.33"
             android:onClick="showNativeCImage"
+            android:textAllCaps="false"
             android:text="NativeC"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/add_noise"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:textSize="15sp"
+            android:layout_weight="0.33"
+            android:onClick="addNoise"
+            android:textAllCaps="false"
+            android:text="Add noise"
             android:visibility="visible" />
 
     </LinearLayout>
@@ -57,5 +71,12 @@
         android:layout_gravity="center_vertical|center_horizontal"
         android:layout_weight="1.0"
         android:scaleType="fitStart" />
+
+    <Button
+        android:id="@+id/add_opencl"
+        android:onClick="add"
+        android:text="add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

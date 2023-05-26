@@ -38,7 +38,10 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,7 +51,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Random;
 
 public class MainActivity extends Activity {
     protected static final String TAG = "OpenCLActivity";
@@ -85,11 +90,13 @@ public class MainActivity extends Activity {
 
     public static native int runOpenCL(Bitmap bmpIn, Bitmap bmpOut, int info[]);
 
+    public static native int addByOpenCL(int[] array1, int[] array2, int size);
+
     public static native int runNativeC(Bitmap bmpIn, Bitmap bmpOut, int info[]);
 
     final int info[] = new int[3]; // Width, Height, Execution time (ms)
 
-    Bitmap bmpOrig, bmpOpenCL, bmpNativeC;
+    Bitmap bmpOrig, bmpCurrent, bmpOpenCL, bmpNativeC;
     ImageView imageView;
     TextView textView;
 
@@ -102,35 +109,90 @@ public class MainActivity extends Activity {
         textView = findViewById(R.id.resultText);
 
         copyFile("bilateralKernel.cl"); //copy cl kernel file from assets to /data/data/...assets
+        copyFile("add.cl"); //copy cl kernel file from assets to /data/data/...assets
 
-        bmpOrig = BitmapFactory.decodeResource(this.getResources(), R.drawable.brusigablommor);
+        bmpOrig = BitmapFactory.decodeResource(this.getResources(), R.drawable.doge);
         info[0] = bmpOrig.getWidth();
         info[1] = bmpOrig.getHeight();
 
         bmpOpenCL = Bitmap.createBitmap(info[0], info[1], Config.ARGB_8888);
         bmpNativeC = Bitmap.createBitmap(info[0], info[1], Config.ARGB_8888);
-        textView.setText(R.string.original_str);
-        imageView.setImageBitmap(bmpOrig);
+        showOriginalImage(null);
     }
 
     public void showOriginalImage(View v) {
+        bmpCurrent = convertToMutable(bmpOrig);
         textView.setText(R.string.original_str);
-        imageView.setImageBitmap(bmpOrig);
+        imageView.setImageBitmap(bmpCurrent);
     }
 
     public void showOpenCLImage(View v) {
         info[2] = 0;
-        runOpenCL(bmpOrig, bmpOpenCL, info);
+        runOpenCL(bmpCurrent, bmpCurrent, info);
         textView.setText(String.format(Locale.US, "%s %d ms",
                 getString(R.string.opencl_time_str), info[2]));
-        imageView.setImageBitmap(bmpOpenCL);
+        imageView.setImageBitmap(bmpCurrent);
     }
 
     public void showNativeCImage(View v) {
         info[2] = 0;
-        runNativeC(bmpOrig, bmpNativeC, info);
+        runNativeC(bmpCurrent, bmpNativeC, info);
         textView.setText(String.format(Locale.US, "%s %d ms",
                 getString(R.string.native_time_str), info[2]));
         imageView.setImageBitmap(bmpNativeC);
+    }
+
+    Random random = new Random();
+    int range = 255;
+
+    private int generateNoise(int origin) {
+        int noise = (random.nextInt(range)) * (random.nextBoolean() ? 1 : -1);
+        origin += noise;
+        origin %= 255;
+        return origin;
+    }
+
+    public void addNoise(View v) {
+        Log.d("MainActivity", bmpCurrent.isMutable() +"");
+        for (int i = 0; i < bmpCurrent.getHeight(); i++) {
+            for (int j = 0; j < bmpCurrent.getWidth(); j++) {
+                int r, g, b, a;
+                int color = bmpCurrent.getPixel(j, i);
+                a = generateNoise(Color.alpha(color));
+                r = (Color.red(color));
+                g = (Color.green(color));
+                b = (Color.blue(color));
+                bmpCurrent.setPixel(j, i, Color.argb(a, r, g, b));
+            }
+        }
+        imageView.setImageBitmap(bmpCurrent);
+    }
+
+    public Bitmap convertToMutable(Bitmap imgIn) {
+        try {
+            Bitmap result = Bitmap.createBitmap(imgIn.getWidth(), imgIn.getHeight(), imgIn.getConfig());
+            for(int i = 0;i<imgIn.getHeight();i++) {
+                for(int j = 0;j<imgIn.getWidth();j++) {
+                    result.setPixel(j, i, imgIn.getPixel(j,i));
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void add(View v) {
+        int[] a = new int[10];
+        int[] b = new int[10];
+        Arrays.fill(b, 100);
+        for(int i = 0;i<10;i++) {
+            a[i] = i;
+        }
+        addByOpenCL(a, b, 10);
+        for(int i = 0;i<10;i++) {
+            Log.d("MainAc", b[i] + "");
+        }
     }
 }
