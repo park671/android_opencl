@@ -91,6 +91,7 @@ public class MainActivity extends Activity {
     public static native int runOpenCL(Bitmap bmpIn, Bitmap bmpOut, int info[]);
 
     public static native int addByOpenCL(int[] array1, int[] array2, int size);
+    public static native int isSameOpenCL(int[] array1, int[] array2, int size);
 
     public static native int runNativeC(Bitmap bmpIn, Bitmap bmpOut, int info[]);
 
@@ -110,6 +111,7 @@ public class MainActivity extends Activity {
 
         copyFile("bilateralKernel.cl"); //copy cl kernel file from assets to /data/data/...assets
         copyFile("add.cl"); //copy cl kernel file from assets to /data/data/...assets
+        copyFile("same_array.cl"); //copy cl kernel file from assets to /data/data/...assets
 
         bmpOrig = BitmapFactory.decodeResource(this.getResources(), R.drawable.doge);
         info[0] = bmpOrig.getWidth();
@@ -194,5 +196,16 @@ public class MainActivity extends Activity {
         for(int i = 0;i<10;i++) {
             Log.d("MainAc", b[i] + "");
         }
+    }
+
+    public void same(View v) {
+        int[] a = new int[10];
+        int[] b = new int[10];
+        Arrays.fill(b, 100);
+        for(int i = 0;i<10;i++) {
+            a[i] = i;
+        }
+        int result = isSameOpenCL(a, b, 10);
+        Log.d(TAG, "same=" + (result == 0));
     }
 }

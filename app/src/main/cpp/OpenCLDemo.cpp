@@ -94,3 +94,15 @@ Java_com_example_opencl_MainActivity_addByOpenCL(JNIEnv *env, jclass clazz, jint
     env->ReleaseIntArrayElements(array2, b, 0);
     return 0;
 }
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_example_opencl_MainActivity_isSameOpenCL(JNIEnv *env, jclass clazz, jintArray array1,
+                                                  jintArray array2, jint size) {
+    int *a = env->GetIntArrayElements(array1, JNI_FALSE);
+    int *b = env->GetIntArrayElements(array2, JNI_FALSE);
+    int result = 0;
+    openCLSame(a, b, &result, size);
+    env->ReleaseIntArrayElements(array1, a, 0);
+    env->ReleaseIntArrayElements(array2, b, 0);
+    return result;
+}
